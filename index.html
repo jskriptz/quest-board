@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quest Board</title>
+<style>
+  :root {
+    --bg: #0f0c0a;
+    --bg2: #1a1510;
+    --bg3: #252018;
+    --border: #3a3020;
+    --border2: #5a4a30;
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --purple-mid: #534AB7;
+    --purple-border: #AFA9EC;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-dark: #0F6E56;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --text: #e8e0d0;
+    --text2: #9a8f7a;
+    --text3: #5a5045;
+    --success: #1D9E75;
+    --danger: #c0392b;
+    --gold: #d4a030;
+    --gold-light: #faeeda;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.03em;
+  }
+
+  header .subtitle {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 1px;
+  }
+
+  .xp-header {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .xp-header .lvl {
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .xp-bar-bg {
+    width: 120px;
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .xp-bar-fill {
+    height: 100%;
+    background: var(--purple);
+    border-radius: 2px;
+    transition: width 0.5s;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 61px);
+  }
+
+  .sidebar {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .main {
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .section-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+
+  .section-title:first-child { margin-top: 0; }
+
+  .portrait-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .portrait-box {
+    width: 110px;
+    height: 130px;
+    border-radius: 8px;
+    border: 1.5px dashed var(--border2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    background: var(--bg3);
+    transition: border-color 0.15s;
+    position: relative;
+  }
+
+  .portrait-box:hover { border-color: var(--purple); }
+
+  .portrait-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .portrait-hint {
+    font-size: 11px;
+    color: var(--text3);
+    text-align: center;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .char-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .char-class {
+    font-size: 12px;
+    color: var(--purple);
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .stat-box {
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 4px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .stat-name {
+    font-size: 10px;
+    color: var(--text2);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .divider {
+    height: 0.5px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  .eq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .eq-slot {
+    border: 0.5px dashed var(--border2);
+    border-radius: 6px;
+    padding: 7px 8px;
+    min-height: 44px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .eq-slot.filled {
+    border-style: solid;
+    border-color: var(--purple-border);
+    background: rgba(127,119,221,0.08);
+  }
+
+  .eq-slot-name {
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .eq-slot-item {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--purple-border);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  .eq-empty {
+    font-size: 11px;
+    color: var(--text3);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  .inv-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 24px;
+  }
+
+  .inv-pill {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: rgba(127,119,221,0.15);
+    color: var(--purple-border);
+    border: 0.5px solid var(--purple-mid);
+  }
+
+  .quest-list { margin-bottom: 8px; }
+
+  .quest-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 0.5px solid var(--border);
+    background: var(--bg2);
+    margin-bottom: 8px;
+    transition: border-color 0.12s;
+  }
+
+  .quest-item:hover { border-color: var(--border2); }
+
+  .quest-item.done { opacity: 0.4; }
+  .quest-item.done .qt { text-decoration: line-through; }
+
+  .qcheck {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .qcheck:hover { border-color: var(--purple); }
+  .qcheck.done { background: var(--purple); border-color: var(--purple); }
+  .qcheck svg { display: none; }
+  .qcheck.done svg { display: block; }
+
+  .qt {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .qd {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .qr {
+    font-size: 11px;
+    color: var(--purple);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-bottom: 4px;
+    letter-spacing: 0.03em;
+  }
+
+  .tag-main { background: rgba(127,119,221,0.15); color: var(--purple-border); }
+  .tag-side { background: rgba(29,158,117,0.15); color: #5DCAA5; }
+
+  .del-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text3);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1;
+    transition: color 0.12s;
+  }
+
+  .del-btn:hover { color: var(--danger); }
+
+  .add-section {
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 4px;
+  }
+
+  .add-section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text2);
+    margin-bottom: 8px;
+  }
+
+  .add-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .add-row:last-child { margin-bottom: 0; }
+
+  input[type="text"], select {
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    flex: 1;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus, select:focus { border-color: var(--purple); }
+
+  select { cursor: pointer; flex: none; }
+
+  .add-btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 0.5px solid var(--purple-mid);
+    background: rgba(127,119,221,0.15);
+    color: var(--purple-border);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.12s;
+  }
+
+  .add-btn:hover { background: rgba(127,119,221,0.25); }
+  .add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .roll-card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .roll-prompt {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 12px;
+  }
+
+  .roll-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 0.5px solid var(--gold);
+    background: rgba(212,160,48,0.1);
+    color: var(--gold);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.15s;
+  }
+
+  .roll-btn:hover { background: rgba(212,160,48,0.2); }
+  .roll-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .loot-reveal {
+    border-radius: 8px;
+    border: 0.5px solid var(--purple-border);
+    background: rgba(127,119,221,0.1);
+    padding: 14px 16px;
+    margin-top: 12px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .loot-type {
+    font-size: 10px;
+    color: var(--purple);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .loot-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--purple-border);
+  }
+
+  .loot-legendary { color: var(--gold) !important; border-color: var(--gold) !important; background: rgba(212,160,48,0.08) !important; }
+  .loot-legendary .loot-type { color: var(--gold); }
+
+  .loot-desc {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 5px;
+    line-height: 1.5;
+  }
+
+  .roll-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold);
+    display: inline-block;
+    margin-right: 8px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .quest-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .tab {
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: 0.5px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+
+  .tab.active {
+    background: var(--bg2);
+    border-color: var(--border2);
+    color: var(--text);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--text);
+    transition: transform 0.3s ease;
+    z-index: 100;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  #portrait-input { display: none; }
+
+  @media (max-width: 640px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>&#9876; Quest Board</h1>
+    <div class="subtitle">Level <span id="hdr-lvl">1</span> Adventurer</div>
+  </div>
+  <div class="xp-header">
+    <div class="lvl"><span id="hdr-xp">0</span> / <span id="hdr-xpmax">100</span> XP</div>
+    <div class="xp-bar-bg"><div class="xp-bar-fill" id="xpbar" style="width:0%"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="portrait-area">
+      <div class="portrait-box" id="portrait-box" onclick="document.getElementById('portrait-input').click()" title="Click to upload portrait">
+        <svg id="portrait-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="18" height="18" rx="3" stroke="#5a4a30" stroke-width="1.5"/>
+          <circle cx="9" cy="9" r="2" stroke="#5a4a30" stroke-width="1.5"/>
+          <path d="M3 16l5-4 4 3 3-2 6 5" stroke="#5a4a30" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="portrait-hint" id="portrait-hint">tap to add<br>portrait</span>
+        <img id="portrait-img"/>
+      </div>
+      <input type="file" id="portrait-input" accept="image/*">
+      <div class="char-name">The Seeker</div>
+      <div class="char-class">Class: Unknown</div>
+    </div>
+
+    <div class="section-title">Stats</div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-val" id="s0">10</div><div class="stat-name">STR</div></div>
+      <div class="stat-box"><div class="stat-val" id="s1">10</div><div class="stat-name">CHA</div></div>
+      <div class="stat-box"><div class="stat-val" id="s2">10</div><div class="stat-name">INT</div></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title">Equipment</div>
+    <div class="eq-grid">
+      <div class="eq-slot" id="eq-weapon"><div class="eq-slot-name">Weapon</div><div class="eq-empty">— empty —</div></div>
+      <div class="eq-slot" id="eq-offhand"><div class="eq-slot-name">Off-hand</div><div class="eq-empty">— empty —</div></div>
+      <div class="eq-slot" id="eq-helm"><div class="eq-slot-name">Helm</div><div class="eq-empty">— empty —</div></div>
+      <div class="eq-slot" id="eq-chest"><div class="eq-slot-name">Chest</div><div class="eq-empty">— empty —</div></div>
+      <div class="eq-slot" id="eq-ring"><div class="eq-slot-name">Ring</div><div class="eq-empty">— empty —</div></div>
+      <div class="eq-slot" id="eq-amulet"><div class="eq-slot-name">Amulet</div><div class="eq-empty">— empty —</div></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title">Inventory</div>
+    <div class="inv-area" id="inv">
+      <span style="font-size:12px;color:var(--text3);font-style:italic;">Empty</span>
+    </div>
+
+    <div class="divider"></div>
+    <div class="roll-card" style="margin-bottom:0;">
+      <div class="section-title" style="margin-top:0;">Loot roll</div>
+      <div class="roll-prompt" id="roll-prompt">Complete a quest to earn a roll.</div>
+      <button class="roll-btn" id="rollbtn" disabled onclick="rollLoot()">&#x2684; Roll for loot</button>
+      <div id="loot-out"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="quest-tabs">
+      <button class="tab active" onclick="switchTab('main',this)">Main quests</button>
+      <button class="tab" onclick="switchTab('side',this)">Side quests</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-main">
+      <div class="quest-list" id="main-quests"></div>
+      <div class="add-section">
+        <div class="add-section-label">+ Add main quest</div>
+        <div class="add-row">
+          <input type="text" id="main-input" placeholder="e.g. follow up with recruiter...">
+          <button class="add-btn" id="main-add-btn" onclick="addQuest('main')">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-side">
+      <div class="quest-list" id="side-quests"></div>
+      <div class="add-section">
+        <div class="add-section-label">+ Add side quest</div>
+        <div class="add-row">
+          <input type="text" id="side-input" placeholder="e.g. clean desk, build model...">
+        </div>
+        <div class="add-row">
+          <select id="side-stat">
+            <option value="-1">No stat boost</option>
+            <option value="0">+STR (physical task)</option>
+            <option value="1">+CHA (social task)</option>
+            <option value="2">+INT (mental task)</option>
+          </select>
+          <button class="add-btn" id="side-add-btn" onclick="addQuest('side')">Add</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const stats=[10,10,10];
+let xp=0,level=1,rolls=0,qid=0;
+const slots={weapon:null,offhand:null,helm:null,chest:null,ring:null,amulet:null};
+const statIdx={STR:0,CHA:1,INT:2};
+const statNames=['STR','CHA','INT'];
+window.quests={main:[],side:[]};
+
+const lootTable=[
+  {type:"weapon",slot:"weapon",name:"Blade of Confident Words",desc:"+1 CHA — your words cut true.",stat:"CHA",val:1},
+  {type:"weapon",slot:"weapon",name:"Staff of Arcane Authority",desc:"+1 INT — knowledge made manifest.",stat:"INT",val:1},
+  {type:"armor",slot:"chest",name:"Mantle of Persistence",desc:"+1 STR — rejection slides off.",stat:"STR",val:1},
+  {type:"armor",slot:"helm",name:"Helm of Focus",desc:"+1 INT — your mind sharpens under pressure.",stat:"INT",val:1},
+  {type:"accessory",slot:"ring",name:"Ring of Resilience",desc:"+2 STR — your resolve is unbreakable.",stat:"STR",val:2},
+  {type:"accessory",slot:"amulet",name:"Amulet of Silver Tongue",desc:"+2 CHA — words flow like honey.",stat:"CHA",val:2},
+  {type:"accessory",slot:"offhand",name:"Tome of Hidden Lore",desc:"+2 INT — ancient secrets unlocked.",stat:"INT",val:2},
+  {type:"legendary",slot:"ring",name:"The Adventurer's Signet",desc:"All stats +1. Forged for those who face the grind without flinching.",stat:"ALL",val:1},
+];
+
+function rewardText(xp,stat,sv){
+  let t='+'+xp+' XP';
+  if(stat>=0) t+=' · +'+sv+' '+statNames[stat];
+  t+=' · loot roll';
+  return t;
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function makeQuestEl(q,type){
+  const div=document.createElement('div');
+  div.className='quest-item';
+  div.id='qi'+q.id;
+  div.innerHTML=`
+    <div class="qcheck" id="qc${q.id}" onclick="completeQuest(${q.id})">
+      <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="flex:1;">
+      <div class="tag tag-${type}">${type}</div>
+      <div class="qt" id="qt${q.id}">${q.title}</div>
+      <div class="qd" id="qd${q.id}">${q.desc||''}</div>
+      <div class="qr">${rewardText(q.xp,q.stat,q.sv)}</div>
+    </div>
+    <button class="del-btn" onclick="deleteQuest(${q.id},'${type}')" title="Remove quest">&#x2715;</button>
+  `;
+  return div;
+}
+
+function addQuest(type){
+  const inp=document.getElementById(type+'-input');
+  const rawText=inp.value.trim();
+  if(!rawText) return;
+  inp.value='';
+
+  const stat=type==='side'
+    ? parseInt(document.getElementById('side-stat').value)
+    : (rawText.match(/apply|job|applic/i)?0:rawText.match(/study|learn|read|research/i)?2:1);
+  const xpAmt=type==='main'?30:15;
+  const sv=stat>=0?1:0;
+
+  const q={id:qid++,title:rawText,desc:'Inscribing quest lore...',xp:xpAmt,stat,sv,done:false,type};
+  window.quests[type].push(q);
+  const el=makeQuestEl(q,type);
+  document.getElementById(type+'-quests').appendChild(el);
+
+  generateFlavour(rawText, type, q.id);
+}
+
+async function generateFlavour(rawText, type, id){
+  const titleEl=document.getElementById('qt'+id);
+  const descEl=document.getElementById('qd'+id);
+  if(titleEl) titleEl.innerHTML='<span class="spinner"></span>Inscribing...';
+
+  const context=type==='main'
+    ? 'This is a main quest related to job searching or career.'
+    : 'This is a side quest — a personal task, hobby, chore, or creative project.';
+
+  const prompt=`You are a dark fantasy RPG quest scribe. Transform this plain task into an epic quest entry.
+
+Task: "${rawText}"
+Context: ${context}
+
+Reply with ONLY a raw JSON object, no markdown, no backticks:
+{"title":"Short epic quest title (4-6 words)","desc":"One punchy dark fantasy sentence describing the quest."}`;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:200,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    if(!res.ok) throw new Error('status '+res.status);
+    const data=await res.json();
+    const raw=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean=raw.replace(/```[\s\S]*?```/g,'').replace(/`/g,'').trim();
+    const s=clean.indexOf('{'), e=clean.lastIndexOf('}');
+    if(s===-1||e===-1) throw new Error('no JSON');
+    const f=JSON.parse(clean.slice(s,e+1));
+    if(titleEl) titleEl.textContent=f.title;
+    if(descEl) descEl.textContent=f.desc;
+    const q=[...window.quests.main,...window.quests.side].find(q=>q.id===id);
+    if(q){q.title=f.title;q.desc=f.desc;}
+  } catch(err) {
+    if(titleEl) titleEl.textContent=rawText;
+    if(descEl) descEl.textContent='';
+  }
+}
+
+function deleteQuest(id,type){
+  const el=document.getElementById('qi'+id);
+  if(el) el.remove();
+  window.quests[type]=window.quests[type].filter(q=>q.id!==id);
+}
+
+function completeQuest(id){
+  for(const type of['main','side']){
+    const q=window.quests[type].find(q=>q.id===id);
+    if(q&&!q.done){
+      q.done=true;
+      document.getElementById('qi'+id).classList.add('done');
+      document.getElementById('qc'+id).classList.add('done');
+      xp+=q.xp;
+      if(q.stat>=0) stats[q.stat]+=q.sv;
+      const maxXP=level*100;
+      if(xp>=maxXP){xp-=maxXP;level++;showToast('Level up! You are now level '+level+'.');}
+      rolls++;
+      document.getElementById('rollbtn').disabled=false;
+      document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
+      showToast('Quest complete! Loot roll earned.');
+      render();
+      return;
+    }
+  }
+}
+
+function rollLoot(){
+  if(rolls<=0)return;
+  rolls--;
+  const roll=Math.floor(Math.random()*20)+1;
+  let item;
+  if(roll===20) item=lootTable[7];
+  else if(roll>=16) item=lootTable[4+Math.floor(Math.random()*3)];
+  else item=lootTable[Math.floor(Math.random()*4)];
+
+  if(item.stat==='ALL'){stats[0]++;stats[1]++;stats[2]++;}
+  else stats[statIdx[item.stat]]+=item.val;
+
+  if(slots[item.slot]===null){
+    slots[item.slot]=item.name;
+  } else {
+    const inv=document.getElementById('inv');
+    if(inv.querySelector('span')) inv.innerHTML='';
+    const pill=document.createElement('div');
+    pill.className='inv-pill';
+    pill.textContent=item.name;
+    inv.appendChild(pill);
+  }
+
+  const isLegendary=roll===20;
+  document.getElementById('loot-out').innerHTML=`
+    <div class="loot-reveal${isLegendary?' loot-legendary':''}">
+      <div class="loot-type">${item.type} · <span class="roll-num">${roll}</span></div>
+      <div class="loot-name">${item.name}</div>
+      <div class="loot-desc">${item.desc}</div>
+    </div>`;
+
+  if(rolls>0){
+    document.getElementById('roll-prompt').textContent=rolls+' roll'+(rolls>1?'s':'')+' remaining.';
+  } else {
+    document.getElementById('rollbtn').disabled=true;
+    document.getElementById('roll-prompt').textContent='Complete more quests to earn rolls.';
+  }
+  if(isLegendary) showToast('LEGENDARY drop! All stats +1!');
+  render();
+}
+
+function render(){
+  ['s0','s1','s2'].forEach((id,i)=>document.getElementById(id).textContent=stats[i]);
+  const maxXP=level*100;
+  document.getElementById('hdr-xp').textContent=xp;
+  document.getElementById('hdr-xpmax').textContent=maxXP;
+  document.getElementById('hdr-lvl').textContent=level;
+  document.getElementById('xpbar').style.width=Math.round(xp/maxXP*100)+'%';
+  Object.entries(slots).forEach(([slot,item])=>{
+    const el=document.getElementById('eq-'+slot);
+    if(!el||!item)return;
+    el.classList.add('filled');
+    el.innerHTML='<div class="eq-slot-name">'+slot.charAt(0).toUpperCase()+slot.slice(1)+'</div><div class="eq-slot-item">'+item+'</div>';
+  });
+}
+
+const defaultMain=[
+  {title:"The Messenger's Call",desc:"Reach out to your network — send word to potential allies across the realm.",xp:30,stat:1,sv:2},
+  {title:"The Guild Applications",desc:"Submit your scrolls to the guilds — your fate awaits their judgement.",xp:40,stat:0,sv:2},
+  {title:"The Scholar's Trial",desc:"Study the ancient runes of accessibility — prepare for the knowledge trial.",xp:30,stat:2,sv:2},
+];
+const defaultSide=[
+  {title:"Purge the Chaos from the Keep",desc:"Clean the office — back table, airbrush table, desk, vacuum.",xp:20,stat:0,sv:1},
+  {title:"Summon the Daemon Prince",desc:"Assemble the forbidden miniature — bind the Daemon Prince to your will.",xp:25,stat:2,sv:1},
+  {title:"Anoint the Warriors",desc:"Spray prime all models — prepare your army for battle.",xp:15,stat:-1,sv:0},
+  {title:"The First Coat",desc:"Paint models brown — the first ritual of colour begins.",xp:15,stat:2,sv:1},
+  {title:"Forge the Battlefield",desc:"Create bases for your models — the ground must be worthy of battle.",xp:20,stat:0,sv:1},
+  {title:"Seal the Ground",desc:"Spray prime the bases — bind them against the ravages of war.",xp:15,stat:-1,sv:0},
+];
+
+defaultMain.forEach(d=>{const q={...d,id:qid++,done:false,type:'main'};window.quests.main.push(q);document.getElementById('main-quests').appendChild(makeQuestEl(q,'main'));});
+defaultSide.forEach(d=>{const q={...d,id:qid++,done:false,type:'side'};window.quests.side.push(q);document.getElementById('side-quests').appendChild(makeQuestEl(q,'side'));});
+
+document.getElementById('portrait-input').addEventListener('change',function(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const img=document.getElementById('portrait-img');
+    img.src=ev.target.result;
+    img.style.display='block';
+    document.getElementById('portrait-icon').style.display='none';
+    document.getElementById('portrait-hint').style.display='none';
+    document.getElementById('portrait-box').style.border='none';
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('main-input').addEventListener('keydown',e=>{if(e.key==='Enter')addQuest('main');});
+document.getElementById('side-input').addEventListener('keydown',e=>{if(e.key==='Enter')addQuest('side');});
+
+render();
+</script>
+</body>
+</html>
