@@ -851,6 +851,128 @@
   .eq-slot.rarity-rare .eq-slot-item { color: var(--rare); }
   .eq-slot.rarity-legendary .eq-slot-item { color: var(--legendary); }
 
+  /* Sidebar XP Bar */
+  .sidebar-xp {
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  .sidebar-xp-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple-dark), var(--purple));
+    border-radius: 3px;
+    transition: width 0.5s;
+  }
+
+  .sidebar-xp-text {
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  /* Save Slots */
+  .save-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .save-slot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    transition: border-color 0.12s;
+  }
+
+  .save-slot.active {
+    border-color: var(--purple);
+    background: rgba(127,119,221,0.08);
+  }
+
+  .slot-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .slot-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .slot-details {
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .slot-details.has-save {
+    color: var(--text2);
+  }
+
+  .slot-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  .slot-btn {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+
+  .slot-btn.load {
+    background: rgba(127,119,221,0.15);
+    border: 0.5px solid var(--purple-mid);
+    color: var(--purple-border);
+  }
+
+  .slot-btn.load:hover:not(:disabled) {
+    background: rgba(127,119,221,0.25);
+  }
+
+  .slot-btn.load:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .slot-btn.delete {
+    background: rgba(192,57,43,0.1);
+    border: 0.5px solid var(--danger);
+    color: var(--danger);
+    padding: 4px 6px;
+  }
+
+  .slot-btn.delete:hover {
+    background: rgba(192,57,43,0.2);
+  }
+
+  .current-slot {
+    font-size: 11px;
+    color: var(--text2);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .current-slot span {
+    color: var(--purple);
+    font-weight: 500;
+  }
+
   @media (max-width: 640px) {
     .layout { grid-template-columns: 1fr; }
     .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
@@ -886,6 +1008,12 @@
       <input type="file" id="portrait-input" accept="image/*">
       <div class="char-name">The Seeker</div>
       <div class="char-class" id="char-class">Class: Unknown</div>
+      <div class="sidebar-xp">
+        <div class="sidebar-xp-bar">
+          <div class="sidebar-xp-fill" id="sidebar-xp-fill" style="width:0%"></div>
+        </div>
+        <div class="sidebar-xp-text">Level <span id="sidebar-lvl">1</span> · <span id="sidebar-xp">0</span>/<span id="sidebar-xpmax">100</span> XP</div>
+      </div>
     </div>
 
     <div class="section-title">Stats</div>
@@ -929,7 +1057,41 @@
     </div>
 
     <div class="divider"></div>
-    <button class="reset-btn" onclick="resetGame()">Reset Progress</button>
+    <div class="section-title">Save Slots</div>
+    <div class="save-slots" id="save-slots">
+      <div class="save-slot" id="save-slot-1">
+        <div class="slot-info">
+          <span class="slot-name">Slot 1</span>
+          <span class="slot-details" id="slot-1-details">Empty</span>
+        </div>
+        <div class="slot-actions">
+          <button class="slot-btn load" onclick="loadSlot(1)" id="slot-1-load" disabled>Load</button>
+          <button class="slot-btn delete" onclick="deleteSlot(1)" id="slot-1-delete" style="display:none;">×</button>
+        </div>
+      </div>
+      <div class="save-slot" id="save-slot-2">
+        <div class="slot-info">
+          <span class="slot-name">Slot 2</span>
+          <span class="slot-details" id="slot-2-details">Empty</span>
+        </div>
+        <div class="slot-actions">
+          <button class="slot-btn load" onclick="loadSlot(2)" id="slot-2-load" disabled>Load</button>
+          <button class="slot-btn delete" onclick="deleteSlot(2)" id="slot-2-delete" style="display:none;">×</button>
+        </div>
+      </div>
+      <div class="save-slot" id="save-slot-3">
+        <div class="slot-info">
+          <span class="slot-name">Slot 3</span>
+          <span class="slot-details" id="slot-3-details">Empty</span>
+        </div>
+        <div class="slot-actions">
+          <button class="slot-btn load" onclick="loadSlot(3)" id="slot-3-load" disabled>Load</button>
+          <button class="slot-btn delete" onclick="deleteSlot(3)" id="slot-3-delete" style="display:none;">×</button>
+        </div>
+      </div>
+    </div>
+    <div class="current-slot">Playing: <span id="current-slot-name">Slot 1</span></div>
+    <button class="reset-btn" onclick="resetGame()" style="margin-top:8px;">Reset Current Slot</button>
   </aside>
 
   <main class="main">
@@ -1042,7 +1204,7 @@
 </div>
 
 <footer class="app-footer">
-  <span id="version-display">Quest Board v02.00.00</span>
+  <span id="version-display">Quest Board v02.01.00</span>
   <span class="footer-sep">|</span>
   <span>© 2026 jskriptz</span>
   <span class="footer-sep">|</span>
@@ -1054,9 +1216,10 @@
 </footer>
 
 <script>
-const APP_VERSION = 'v02.00.00';
+const APP_VERSION = 'v02.01.00';
 const stats=[10,10,10];
 let xp=0,level=1,rolls=0,qid=0;
+let currentSlot=1; // Current save slot (1-3)
 const slots={weapon:null,offhand:null,helm:null,chest:null,ring:null,amulet:null};
 const slotRarities={weapon:null,offhand:null,helm:null,chest:null,ring:null,amulet:null};
 const statIdx={STR:0,CHA:1,INT:2};
@@ -1114,7 +1277,7 @@ function updateApiStatus(){
   }
 }
 
-// Save/Load Game State
+// Save/Load Game State with Multiple Slots
 function saveGame(){
   const state={
     stats:[...stats],
@@ -1126,110 +1289,253 @@ function saveGame(){
     portrait:document.getElementById('portrait-img').src||null,
     playerClass,
     boss:{...boss},
-    totalQuestsCompleted
+    totalQuestsCompleted,
+    savedAt:new Date().toISOString()
   };
-  localStorage.setItem('qb_save',JSON.stringify(state));
+  localStorage.setItem('qb_slot_'+currentSlot,JSON.stringify(state));
+  localStorage.setItem('qb_current_slot',currentSlot);
+  updateSlotUI();
 }
 
-function loadGame(){
-  const raw=localStorage.getItem('qb_save');
+function getSlotKey(slot){
+  return 'qb_slot_'+slot;
+}
+
+function getSlotData(slot){
+  const raw=localStorage.getItem(getSlotKey(slot));
+  if(!raw) return null;
+  try{ return JSON.parse(raw); }catch(e){ return null; }
+}
+
+function updateSlotUI(){
+  for(let i=1;i<=3;i++){
+    const data=getSlotData(i);
+    const detailsEl=document.getElementById('slot-'+i+'-details');
+    const loadBtn=document.getElementById('slot-'+i+'-load');
+    const deleteBtn=document.getElementById('slot-'+i+'-delete');
+    const slotEl=document.getElementById('save-slot-'+i);
+
+    if(data){
+      const cls=data.playerClass?data.playerClass.charAt(0).toUpperCase()+data.playerClass.slice(1):'Unknown';
+      const date=data.savedAt?new Date(data.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
+      detailsEl.textContent=cls+' Lv.'+data.level+(date?' ('+date+')':'');
+      detailsEl.classList.add('has-save');
+      loadBtn.disabled=false;
+      loadBtn.textContent=i===currentSlot?'Playing':'Load';
+      deleteBtn.style.display=i===currentSlot?'none':'block';
+    }else{
+      detailsEl.textContent='Empty';
+      detailsEl.classList.remove('has-save');
+      loadBtn.disabled=true;
+      loadBtn.textContent='Load';
+      deleteBtn.style.display='none';
+    }
+
+    slotEl.classList.toggle('active',i===currentSlot);
+  }
+  document.getElementById('current-slot-name').textContent='Slot '+currentSlot;
+}
+
+function loadSlot(slot){
+  if(slot===currentSlot) return;
+  const data=getSlotData(slot);
+  if(!data){
+    // Start new game in this slot
+    if(!confirm('Start a new game in Slot '+slot+'?')) return;
+    currentSlot=slot;
+    resetGameState();
+    showClassModal();
+    updateSlotUI();
+    return;
+  }
+  if(!confirm('Load Slot '+slot+'? Unsaved progress in current slot will be lost.')) return;
+  currentSlot=slot;
+  localStorage.setItem('qb_current_slot',currentSlot);
+  loadGameFromSlot(slot);
+  updateSlotUI();
+  showToast('Loaded Slot '+slot);
+}
+
+function deleteSlot(slot){
+  if(slot===currentSlot) return;
+  if(!confirm('Delete Slot '+slot+'? This cannot be undone.')) return;
+  localStorage.removeItem(getSlotKey(slot));
+  updateSlotUI();
+  showToast('Slot '+slot+' deleted');
+}
+
+function resetGameState(){
+  stats[0]=10;stats[1]=10;stats[2]=10;
+  xp=0;level=1;rolls=0;qid=0;
+  Object.keys(slots).forEach(k=>slots[k]=null);
+  Object.keys(slotRarities).forEach(k=>slotRarities[k]=null);
+  window.quests={main:[],side:[],daily:[],completed:[]};
+  playerClass=null;
+  boss={active:false,name:'',hp:0,maxHp:0,level:1};
+  totalQuestsCompleted=0;
+
+  // Reset UI
+  document.getElementById('main-quests').innerHTML='';
+  document.getElementById('side-quests').innerHTML='';
+  document.getElementById('daily-quests').innerHTML='';
+  document.getElementById('completed-quests').innerHTML='';
+  document.getElementById('completed-empty').style.display='block';
+  document.getElementById('inv').innerHTML='<span style="font-size:12px;color:var(--text3);font-style:italic;">Empty</span>';
+  document.getElementById('boss-panel').classList.add('hidden');
+  document.getElementById('char-class').textContent='Class: Unknown';
+  document.getElementById('char-class').className='char-class';
+  document.getElementById('portrait-img').src='';
+  document.getElementById('portrait-img').style.display='none';
+  document.getElementById('portrait-icon').style.display='block';
+  document.getElementById('portrait-hint').style.display='block';
+  document.getElementById('portrait-box').style.border='';
+
+  // Reset equipment slots UI
+  ['weapon','offhand','helm','chest','ring','amulet'].forEach(slot=>{
+    const el=document.getElementById('eq-'+slot);
+    el.className='eq-slot';
+    el.innerHTML='<div class="eq-slot-name">'+slot.charAt(0).toUpperCase()+slot.slice(1)+'</div><div class="eq-empty">— empty —</div>';
+  });
+
+  render();
+}
+
+function loadGameFromSlot(slot){
+  const raw=localStorage.getItem(getSlotKey(slot));
   if(!raw) return false;
   try{
     const s=JSON.parse(raw);
-    stats[0]=s.stats[0];stats[1]=s.stats[1];stats[2]=s.stats[2];
-    xp=s.xp;level=s.level;rolls=s.rolls;qid=s.qid;
-    Object.assign(slots,s.slots);
-    if(s.slotRarities) Object.assign(slotRarities,s.slotRarities);
-    window.quests.main=s.quests.main||[];
-    window.quests.side=s.quests.side||[];
-    window.quests.daily=s.quests.daily||[];
-    window.quests.completed=s.quests.completed||[];
-
-    // Load class
-    if(s.playerClass){
-      playerClass=s.playerClass;
-      const classEl=document.getElementById('char-class');
-      classEl.textContent='Class: '+playerClass.charAt(0).toUpperCase()+playerClass.slice(1);
-      classEl.className='char-class '+playerClass;
-      document.getElementById('class-modal').classList.add('hidden');
-    }
-
-    // Load boss
-    if(s.boss){
-      boss=s.boss;
-      if(boss.active){
-        document.getElementById('boss-panel').classList.remove('hidden');
-        renderBoss();
-      }
-    }
-    if(s.totalQuestsCompleted) totalQuestsCompleted=s.totalQuestsCompleted;
-
-    // Render quests
-    document.getElementById('main-quests').innerHTML='';
-    document.getElementById('side-quests').innerHTML='';
-    document.getElementById('daily-quests').innerHTML='';
-    document.getElementById('completed-quests').innerHTML='';
-
-    window.quests.main.forEach(q=>{
-      const el=makeQuestEl(q,'main');
-      if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
-      document.getElementById('main-quests').appendChild(el);
-    });
-    window.quests.side.forEach(q=>{
-      const el=makeQuestEl(q,'side');
-      if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
-      document.getElementById('side-quests').appendChild(el);
-    });
-    window.quests.daily.forEach(q=>{
-      const el=makeQuestEl(q,'daily');
-      if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
-      document.getElementById('daily-quests').appendChild(el);
-    });
-    // Render completed quests
-    window.quests.completed.forEach(q=>{
-      document.getElementById('completed-quests').appendChild(makeCompletedQuestEl(q));
-    });
-    if(window.quests.completed.length>0){
-      document.getElementById('completed-empty').style.display='none';
-    }
-    // Render inventory with rarities
-    if(s.inventory&&s.inventory.length){
-      const inv=document.getElementById('inv');
-      inv.innerHTML='';
-      s.inventory.forEach(item=>{
-        const pill=document.createElement('div');
-        const rarity=typeof item==='object'?item.rarity:'common';
-        const name=typeof item==='object'?item.name:item;
-        pill.className='inv-pill rarity-'+rarity;
-        pill.textContent=name;
-        pill.dataset.rarity=rarity;
-        inv.appendChild(pill);
-      });
-    }
-    // Render portrait
-    if(s.portrait){
-      const img=document.getElementById('portrait-img');
-      img.src=s.portrait;
-      img.style.display='block';
-      document.getElementById('portrait-icon').style.display='none';
-      document.getElementById('portrait-hint').style.display='none';
-      document.getElementById('portrait-box').style.border='none';
-    }
-    // Update roll button
-    if(rolls>0){
-      document.getElementById('rollbtn').disabled=false;
-      document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
-    }
-    // Check daily resets
-    checkDailyResets();
-    return true;
+    return applyGameState(s);
   }catch(e){console.error(e);return false;}
 }
 
+function loadGame(){
+  // Try to load from current slot system first
+  const savedSlot=localStorage.getItem('qb_current_slot');
+  if(savedSlot){
+    currentSlot=parseInt(savedSlot);
+    const slotData=getSlotData(currentSlot);
+    if(slotData){
+      applyGameState(slotData);
+      updateSlotUI();
+      return true;
+    }
+  }
+
+  // Migrate old single-save system to slot 1
+  const oldSave=localStorage.getItem('qb_save');
+  if(oldSave){
+    try{
+      const s=JSON.parse(oldSave);
+      localStorage.setItem('qb_slot_1',oldSave);
+      localStorage.removeItem('qb_save');
+      currentSlot=1;
+      applyGameState(s);
+      updateSlotUI();
+      return true;
+    }catch(e){}
+  }
+
+  updateSlotUI();
+  return false;
+}
+
+function applyGameState(s){
+  stats[0]=s.stats[0];stats[1]=s.stats[1];stats[2]=s.stats[2];
+  xp=s.xp;level=s.level;rolls=s.rolls;qid=s.qid;
+  Object.assign(slots,s.slots);
+  if(s.slotRarities) Object.assign(slotRarities,s.slotRarities);
+  window.quests.main=s.quests.main||[];
+  window.quests.side=s.quests.side||[];
+  window.quests.daily=s.quests.daily||[];
+  window.quests.completed=s.quests.completed||[];
+
+  // Load class
+  if(s.playerClass){
+    playerClass=s.playerClass;
+    const classEl=document.getElementById('char-class');
+    classEl.textContent='Class: '+playerClass.charAt(0).toUpperCase()+playerClass.slice(1);
+    classEl.className='char-class '+playerClass;
+    document.getElementById('class-modal').classList.add('hidden');
+  }
+
+  // Load boss
+  if(s.boss){
+    boss=s.boss;
+    if(boss.active){
+      document.getElementById('boss-panel').classList.remove('hidden');
+      renderBoss();
+    }
+  }
+  if(s.totalQuestsCompleted) totalQuestsCompleted=s.totalQuestsCompleted;
+
+  // Render quests
+  document.getElementById('main-quests').innerHTML='';
+  document.getElementById('side-quests').innerHTML='';
+  document.getElementById('daily-quests').innerHTML='';
+  document.getElementById('completed-quests').innerHTML='';
+
+  window.quests.main.forEach(q=>{
+    const el=makeQuestEl(q,'main');
+    if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
+    document.getElementById('main-quests').appendChild(el);
+  });
+  window.quests.side.forEach(q=>{
+    const el=makeQuestEl(q,'side');
+    if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
+    document.getElementById('side-quests').appendChild(el);
+  });
+  window.quests.daily.forEach(q=>{
+    const el=makeQuestEl(q,'daily');
+    if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
+    document.getElementById('daily-quests').appendChild(el);
+  });
+  // Render completed quests
+  window.quests.completed.forEach(q=>{
+    document.getElementById('completed-quests').appendChild(makeCompletedQuestEl(q));
+  });
+  if(window.quests.completed.length>0){
+    document.getElementById('completed-empty').style.display='none';
+  }
+  // Render inventory with rarities
+  if(s.inventory&&s.inventory.length){
+    const inv=document.getElementById('inv');
+    inv.innerHTML='';
+    s.inventory.forEach(item=>{
+      const pill=document.createElement('div');
+      const rarity=typeof item==='object'?item.rarity:'common';
+      const name=typeof item==='object'?item.name:item;
+      pill.className='inv-pill rarity-'+rarity;
+      pill.textContent=name;
+      pill.dataset.rarity=rarity;
+      inv.appendChild(pill);
+    });
+  }
+  // Render portrait
+  if(s.portrait){
+    const img=document.getElementById('portrait-img');
+    img.src=s.portrait;
+    img.style.display='block';
+    document.getElementById('portrait-icon').style.display='none';
+    document.getElementById('portrait-hint').style.display='none';
+    document.getElementById('portrait-box').style.border='none';
+  }
+  // Update roll button
+  if(rolls>0){
+    document.getElementById('rollbtn').disabled=false;
+    document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
+  }
+  // Check daily resets
+  checkDailyResets();
+  return true;
+}
+
 function resetGame(){
-  if(!confirm('Reset all progress? This cannot be undone.')) return;
-  localStorage.removeItem('qb_save');
-  location.reload();
+  if(!confirm('Reset current slot? This cannot be undone.')) return;
+  localStorage.removeItem(getSlotKey(currentSlot));
+  resetGameState();
+  showClassModal();
+  updateSlotUI();
 }
 
 // Expanded Loot Table with Rarities
@@ -1719,10 +2025,20 @@ function rollLoot(){
 function render(){
   ['s0','s1','s2'].forEach((id,i)=>document.getElementById(id).textContent=stats[i]);
   const maxXP=level*100;
+  const xpPercent=Math.round(xp/maxXP*100);
+
+  // Header XP
   document.getElementById('hdr-xp').textContent=xp;
   document.getElementById('hdr-xpmax').textContent=maxXP;
   document.getElementById('hdr-lvl').textContent=level;
-  document.getElementById('xpbar').style.width=Math.round(xp/maxXP*100)+'%';
+  document.getElementById('xpbar').style.width=xpPercent+'%';
+
+  // Sidebar XP
+  document.getElementById('sidebar-xp').textContent=xp;
+  document.getElementById('sidebar-xpmax').textContent=maxXP;
+  document.getElementById('sidebar-lvl').textContent=level;
+  document.getElementById('sidebar-xp-fill').style.width=xpPercent+'%';
+
   Object.entries(slots).forEach(([slot,item])=>{
     const rarity=slotRarities[slot];
     const el=document.getElementById('eq-'+slot);
