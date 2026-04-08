@@ -588,6 +588,49 @@
     background: rgba(192,57,43,0.2);
   }
 
+  .completed-date {
+    font-size: 11px;
+    color: var(--success);
+    margin-top: 4px;
+  }
+
+  .reopen-btn {
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 0.5px solid var(--amber);
+    background: rgba(186,117,23,0.1);
+    color: var(--amber);
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.12s;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .reopen-btn:hover {
+    background: rgba(186,117,23,0.2);
+  }
+
+  .completed-empty {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .quest-item.completed-item {
+    opacity: 0.8;
+    border-color: var(--success);
+    background: rgba(29,158,117,0.05);
+  }
+
+  .quest-item.completed-item .qcheck {
+    background: var(--success);
+    border-color: var(--success);
+  }
+
+  .quest-item.completed-item .qcheck svg {
+    display: block;
+  }
+
   @media (max-width: 640px) {
     .layout { grid-template-columns: 1fr; }
     .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
@@ -673,6 +716,7 @@
     <div class="quest-tabs">
       <button class="tab active" onclick="switchTab('main',this)">Main quests</button>
       <button class="tab" onclick="switchTab('side',this)">Side quests</button>
+      <button class="tab" onclick="switchTab('completed',this)">Completed</button>
     </div>
 
     <div class="tab-panel active" id="tab-main">
@@ -704,6 +748,13 @@
         </div>
       </div>
     </div>
+
+    <div class="tab-panel" id="tab-completed">
+      <div class="quest-list" id="completed-quests"></div>
+      <div class="completed-empty" id="completed-empty">
+        <span style="font-size:13px;color:var(--text3);font-style:italic;">No completed quests yet. Get adventuring!</span>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -715,7 +766,7 @@ let xp=0,level=1,rolls=0,qid=0;
 const slots={weapon:null,offhand:null,helm:null,chest:null,ring:null,amulet:null};
 const statIdx={STR:0,CHA:1,INT:2};
 const statNames=['STR','CHA','INT'];
-window.quests={main:[],side:[]};
+window.quests={main:[],side:[],completed:[]};
 
 // API Key Management (stored locally in user's browser only)
 function saveApiKey(){
@@ -753,7 +804,7 @@ function saveGame(){
     stats:[...stats],
     xp,level,rolls,qid,
     slots:{...slots},
-    quests:{main:[...window.quests.main],side:[...window.quests.side]},
+    quests:{main:[...window.quests.main],side:[...window.quests.side],completed:[...window.quests.completed]},
     inventory:Array.from(document.querySelectorAll('.inv-pill')).map(p=>p.textContent),
     portrait:document.getElementById('portrait-img').src||null
   };
@@ -770,9 +821,11 @@ function loadGame(){
     Object.assign(slots,s.slots);
     window.quests.main=s.quests.main;
     window.quests.side=s.quests.side;
+    window.quests.completed=s.quests.completed||[];
     // Render quests
     document.getElementById('main-quests').innerHTML='';
     document.getElementById('side-quests').innerHTML='';
+    document.getElementById('completed-quests').innerHTML='';
     window.quests.main.forEach(q=>{
       const el=makeQuestEl(q,'main');
       if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
@@ -783,6 +836,13 @@ function loadGame(){
       if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
       document.getElementById('side-quests').appendChild(el);
     });
+    // Render completed quests
+    window.quests.completed.forEach(q=>{
+      document.getElementById('completed-quests').appendChild(makeCompletedQuestEl(q));
+    });
+    if(window.quests.completed.length>0){
+      document.getElementById('completed-empty').style.display='none';
+    }
     // Render inventory
     if(s.inventory&&s.inventory.length){
       const inv=document.getElementById('inv');
@@ -957,11 +1017,16 @@ function deleteQuest(id,type){
 
 function completeQuest(id){
   for(const type of['main','side']){
-    const q=window.quests[type].find(q=>q.id===id);
-    if(q&&!q.done){
+    const idx=window.quests[type].findIndex(q=>q.id===id);
+    if(idx!==-1){
+      const q=window.quests[type][idx];
+      if(q.done) return;
+
+      // Add completion date and mark done
       q.done=true;
-      document.getElementById('qi'+id).classList.add('done');
-      document.getElementById('qc'+id).classList.add('done');
+      q.completedAt=new Date().toISOString();
+
+      // Award rewards
       xp+=q.xp;
       if(q.stat>=0) stats[q.stat]+=q.sv;
       const maxXP=level*100;
@@ -969,12 +1034,92 @@ function completeQuest(id){
       rolls++;
       document.getElementById('rollbtn').disabled=false;
       document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
+
+      // Move to completed
+      window.quests[type].splice(idx,1);
+      window.quests.completed.push(q);
+
+      // Update UI
+      document.getElementById('qi'+id).remove();
+      document.getElementById('completed-quests').appendChild(makeCompletedQuestEl(q));
+      document.getElementById('completed-empty').style.display='none';
+
       showToast('Quest complete! Loot roll earned.');
       render();
       saveGame();
       return;
     }
   }
+}
+
+function reopenQuest(id){
+  const idx=window.quests.completed.findIndex(q=>q.id===id);
+  if(idx===-1) return;
+
+  const q=window.quests.completed[idx];
+
+  // Deduct rewards
+  xp-=q.xp;
+  if(xp<0){
+    // Handle level loss if needed
+    if(level>1){
+      level--;
+      xp=(level*100)+xp; // xp is negative, so this subtracts
+    }else{
+      xp=0;
+    }
+  }
+  if(q.stat>=0) stats[q.stat]=Math.max(0,stats[q.stat]-q.sv);
+  if(rolls>0) rolls--;
+
+  // Update roll button
+  if(rolls>0){
+    document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
+  }else{
+    document.getElementById('rollbtn').disabled=true;
+    document.getElementById('roll-prompt').textContent='Complete more quests to earn rolls.';
+  }
+
+  // Reset quest state
+  q.done=false;
+  delete q.completedAt;
+
+  // Move back to original list
+  window.quests.completed.splice(idx,1);
+  window.quests[q.type].push(q);
+
+  // Update UI
+  document.getElementById('qi'+id).remove();
+  document.getElementById(q.type+'-quests').appendChild(makeQuestEl(q,q.type));
+
+  // Show empty message if no completed quests
+  if(window.quests.completed.length===0){
+    document.getElementById('completed-empty').style.display='block';
+  }
+
+  showToast('Quest reopened. Rewards deducted.');
+  render();
+  saveGame();
+}
+
+function makeCompletedQuestEl(q){
+  const div=document.createElement('div');
+  div.className='quest-item completed-item';
+  div.id='qi'+q.id;
+  const completedDate=q.completedAt?new Date(q.completedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'Unknown';
+  div.innerHTML=`
+    <div class="qcheck done">
+      <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="flex:1;">
+      <div class="tag tag-${q.type}">${q.type}</div>
+      <div class="qt">${q.title}</div>
+      <div class="qd">${q.desc||''}</div>
+      <div class="completed-date">Completed: ${completedDate}</div>
+    </div>
+    <button class="reopen-btn" onclick="reopenQuest(${q.id})" title="Reopen quest (deducts rewards)">Reopen</button>
+  `;
+  return div;
 }
 
 function rollLoot(){
