@@ -631,6 +631,30 @@
     display: block;
   }
 
+  .app-footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .app-footer a {
+    color: var(--text2);
+    text-decoration: none;
+    transition: color 0.12s;
+  }
+
+  .app-footer a:hover {
+    color: var(--purple);
+  }
+
+  .footer-sep {
+    margin: 0 8px;
+    color: var(--border2);
+  }
+
   @media (max-width: 640px) {
     .layout { grid-template-columns: 1fr; }
     .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
@@ -760,7 +784,20 @@
 
 <div class="toast" id="toast"></div>
 
+<footer class="app-footer">
+  <span id="version-display">Quest Board v01.00.00</span>
+  <span class="footer-sep">|</span>
+  <span>© 2026 jskriptz</span>
+  <span class="footer-sep">|</span>
+  <a href="LICENSE" target="_blank">MIT License</a>
+  <span class="footer-sep">|</span>
+  <a href="docs/PRIVACY.md" target="_blank">Privacy</a>
+  <span class="footer-sep">|</span>
+  <a href="docs/TERMS.md" target="_blank">Terms</a>
+</footer>
+
 <script>
+const APP_VERSION = 'v01.00.00';
 const stats=[10,10,10];
 let xp=0,level=1,rolls=0,qid=0;
 const slots={weapon:null,offhand:null,helm:null,chest:null,ring:null,amulet:null};
