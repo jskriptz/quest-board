@@ -28,6 +28,15 @@
     --danger: #c0392b;
     --gold: #d4a030;
     --gold-light: #faeeda;
+    /* Rarity colors */
+    --common: #9a8f7a;
+    --uncommon: #1D9E75;
+    --rare: #5b8dd9;
+    --legendary: #d4a030;
+    /* Class colors */
+    --warrior: #c0392b;
+    --mage: #5b8dd9;
+    --rogue: #9b59b6;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -655,6 +664,193 @@
     color: var(--border2);
   }
 
+  /* Class Selection Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .modal-overlay.hidden { display: none; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+  }
+
+  .modal h2 {
+    color: var(--gold);
+    font-size: 18px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .modal-subtitle {
+    color: var(--text2);
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .class-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .class-card {
+    background: var(--bg3);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .class-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+  }
+
+  .class-card.warrior:hover, .class-card.warrior.selected { border-color: var(--warrior); }
+  .class-card.mage:hover, .class-card.mage.selected { border-color: var(--mage); }
+  .class-card.rogue:hover, .class-card.rogue.selected { border-color: var(--rogue); }
+
+  .class-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .class-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .class-card.warrior .class-name { color: var(--warrior); }
+  .class-card.mage .class-name { color: var(--mage); }
+  .class-card.rogue .class-name { color: var(--rogue); }
+
+  .class-bonus {
+    font-size: 10px;
+    color: var(--text2);
+    line-height: 1.4;
+  }
+
+  .char-class.warrior { color: var(--warrior); }
+  .char-class.mage { color: var(--mage); }
+  .char-class.rogue { color: var(--rogue); }
+
+  /* Boss Panel */
+  .boss-panel {
+    background: var(--bg3);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .boss-panel.hidden { display: none; }
+
+  .boss-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .boss-icon {
+    font-size: 24px;
+  }
+
+  .boss-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--danger);
+  }
+
+  .boss-hp-bar {
+    height: 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .boss-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--danger), #e74c3c);
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+
+  .boss-hp-text {
+    font-size: 11px;
+    color: var(--text2);
+    text-align: center;
+  }
+
+  /* Daily Quest Styles */
+  .quest-frequency {
+    display: inline-block;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .freq-daily {
+    background: rgba(91,141,217,0.15);
+    color: var(--rare);
+  }
+
+  .freq-weekly {
+    background: rgba(155,89,182,0.15);
+    color: var(--rogue);
+  }
+
+  .reset-timer {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 3px;
+  }
+
+  /* Rarity Colors for Loot */
+  .loot-common { color: var(--common); border-color: var(--common); }
+  .loot-uncommon { color: var(--uncommon); border-color: var(--uncommon); }
+  .loot-rare { color: var(--rare); border-color: var(--rare); }
+  .loot-legendary { color: var(--legendary) !important; border-color: var(--legendary) !important; }
+
+  .loot-reveal.rarity-common { border-color: var(--common); background: rgba(154,143,122,0.08); }
+  .loot-reveal.rarity-uncommon { border-color: var(--uncommon); background: rgba(29,158,117,0.08); }
+  .loot-reveal.rarity-rare { border-color: var(--rare); background: rgba(91,141,217,0.08); }
+  .loot-reveal.rarity-legendary { border-color: var(--legendary); background: rgba(212,160,48,0.08); }
+
+  .inv-pill.rarity-common { background: rgba(154,143,122,0.15); color: var(--common); border-color: var(--common); }
+  .inv-pill.rarity-uncommon { background: rgba(29,158,117,0.15); color: var(--uncommon); border-color: var(--uncommon); }
+  .inv-pill.rarity-rare { background: rgba(91,141,217,0.15); color: var(--rare); border-color: var(--rare); }
+  .inv-pill.rarity-legendary { background: rgba(212,160,48,0.15); color: var(--legendary); border-color: var(--legendary); }
+
+  .eq-slot.rarity-common .eq-slot-item { color: var(--common); }
+  .eq-slot.rarity-uncommon .eq-slot-item { color: var(--uncommon); }
+  .eq-slot.rarity-rare .eq-slot-item { color: var(--rare); }
+  .eq-slot.rarity-legendary .eq-slot-item { color: var(--legendary); }
+
   @media (max-width: 640px) {
     .layout { grid-template-columns: 1fr; }
     .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
@@ -689,7 +885,7 @@
       </div>
       <input type="file" id="portrait-input" accept="image/*">
       <div class="char-name">The Seeker</div>
-      <div class="char-class">Class: Unknown</div>
+      <div class="char-class" id="char-class">Class: Unknown</div>
     </div>
 
     <div class="section-title">Stats</div>
@@ -737,9 +933,22 @@
   </aside>
 
   <main class="main">
+    <!-- Boss Panel -->
+    <div class="boss-panel hidden" id="boss-panel">
+      <div class="boss-header">
+        <span class="boss-icon">&#128128;</span>
+        <span class="boss-name" id="boss-name">The Procrastination Demon</span>
+      </div>
+      <div class="boss-hp-bar">
+        <div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div>
+      </div>
+      <div class="boss-hp-text"><span id="boss-hp">100</span> / <span id="boss-hp-max">100</span> HP</div>
+    </div>
+
     <div class="quest-tabs">
       <button class="tab active" onclick="switchTab('main',this)">Main quests</button>
       <button class="tab" onclick="switchTab('side',this)">Side quests</button>
+      <button class="tab" onclick="switchTab('daily',this)">Daily</button>
       <button class="tab" onclick="switchTab('completed',this)">Completed</button>
     </div>
 
@@ -773,6 +982,29 @@
       </div>
     </div>
 
+    <div class="tab-panel" id="tab-daily">
+      <div class="quest-list" id="daily-quests"></div>
+      <div class="add-section">
+        <div class="add-section-label">+ Add recurring quest</div>
+        <div class="add-row">
+          <input type="text" id="daily-input" placeholder="e.g. morning workout, review goals...">
+        </div>
+        <div class="add-row">
+          <select id="daily-stat">
+            <option value="-1">No stat boost</option>
+            <option value="0">+STR (physical task)</option>
+            <option value="1">+CHA (social task)</option>
+            <option value="2">+INT (mental task)</option>
+          </select>
+          <select id="daily-freq">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
+          <button class="add-btn" onclick="addQuest('daily')">Add</button>
+        </div>
+      </div>
+    </div>
+
     <div class="tab-panel" id="tab-completed">
       <div class="quest-list" id="completed-quests"></div>
       <div class="completed-empty" id="completed-empty">
@@ -784,8 +1016,33 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Class Selection Modal -->
+<div class="modal-overlay" id="class-modal">
+  <div class="modal">
+    <h2>Choose Your Class</h2>
+    <div class="modal-subtitle">Your class determines your strengths and how you gain power</div>
+    <div class="class-options">
+      <div class="class-card warrior" onclick="selectClass('warrior')">
+        <div class="class-icon">&#9876;</div>
+        <div class="class-name">Warrior</div>
+        <div class="class-bonus">+2 base STR<br>+50% STR gains</div>
+      </div>
+      <div class="class-card mage" onclick="selectClass('mage')">
+        <div class="class-icon">&#9733;</div>
+        <div class="class-name">Mage</div>
+        <div class="class-bonus">+2 base INT<br>+50% INT gains</div>
+      </div>
+      <div class="class-card rogue" onclick="selectClass('rogue')">
+        <div class="class-icon">&#9830;</div>
+        <div class="class-name">Rogue</div>
+        <div class="class-bonus">+2 base CHA<br>+50% CHA gains</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer class="app-footer">
-  <span id="version-display">Quest Board v01.00.00</span>
+  <span id="version-display">Quest Board v02.00.00</span>
   <span class="footer-sep">|</span>
   <span>© 2026 jskriptz</span>
   <span class="footer-sep">|</span>
@@ -797,13 +1054,35 @@
 </footer>
 
 <script>
-const APP_VERSION = 'v01.00.00';
+const APP_VERSION = 'v02.00.00';
 const stats=[10,10,10];
 let xp=0,level=1,rolls=0,qid=0;
 const slots={weapon:null,offhand:null,helm:null,chest:null,ring:null,amulet:null};
+const slotRarities={weapon:null,offhand:null,helm:null,chest:null,ring:null,amulet:null};
 const statIdx={STR:0,CHA:1,INT:2};
 const statNames=['STR','CHA','INT'];
-window.quests={main:[],side:[],completed:[]};
+window.quests={main:[],side:[],daily:[],completed:[]};
+
+// Class System
+let playerClass=null;
+const classBonus={
+  warrior:{stat:0,base:2,multiplier:1.5}, // STR
+  mage:{stat:2,base:2,multiplier:1.5},    // INT
+  rogue:{stat:1,base:2,multiplier:1.5}    // CHA
+};
+
+// Boss System
+let boss={active:false,name:'',hp:0,maxHp:0,level:1};
+const bossNames=[
+  'The Procrastination Demon',
+  'Lord of Distraction',
+  'The Comfort Zone Guardian',
+  'Specter of Self-Doubt',
+  'The Overwhelm Titan',
+  'Baron of Burnout',
+  'The Excuse Wraith'
+];
+let totalQuestsCompleted=0;
 
 // API Key Management (stored locally in user's browser only)
 function saveApiKey(){
@@ -841,9 +1120,13 @@ function saveGame(){
     stats:[...stats],
     xp,level,rolls,qid,
     slots:{...slots},
-    quests:{main:[...window.quests.main],side:[...window.quests.side],completed:[...window.quests.completed]},
-    inventory:Array.from(document.querySelectorAll('.inv-pill')).map(p=>p.textContent),
-    portrait:document.getElementById('portrait-img').src||null
+    slotRarities:{...slotRarities},
+    quests:{main:[...window.quests.main],side:[...window.quests.side],daily:[...window.quests.daily],completed:[...window.quests.completed]},
+    inventory:Array.from(document.querySelectorAll('.inv-pill')).map(p=>({name:p.textContent,rarity:p.dataset.rarity||'common'})),
+    portrait:document.getElementById('portrait-img').src||null,
+    playerClass,
+    boss:{...boss},
+    totalQuestsCompleted
   };
   localStorage.setItem('qb_save',JSON.stringify(state));
 }
@@ -856,13 +1139,37 @@ function loadGame(){
     stats[0]=s.stats[0];stats[1]=s.stats[1];stats[2]=s.stats[2];
     xp=s.xp;level=s.level;rolls=s.rolls;qid=s.qid;
     Object.assign(slots,s.slots);
-    window.quests.main=s.quests.main;
-    window.quests.side=s.quests.side;
+    if(s.slotRarities) Object.assign(slotRarities,s.slotRarities);
+    window.quests.main=s.quests.main||[];
+    window.quests.side=s.quests.side||[];
+    window.quests.daily=s.quests.daily||[];
     window.quests.completed=s.quests.completed||[];
+
+    // Load class
+    if(s.playerClass){
+      playerClass=s.playerClass;
+      const classEl=document.getElementById('char-class');
+      classEl.textContent='Class: '+playerClass.charAt(0).toUpperCase()+playerClass.slice(1);
+      classEl.className='char-class '+playerClass;
+      document.getElementById('class-modal').classList.add('hidden');
+    }
+
+    // Load boss
+    if(s.boss){
+      boss=s.boss;
+      if(boss.active){
+        document.getElementById('boss-panel').classList.remove('hidden');
+        renderBoss();
+      }
+    }
+    if(s.totalQuestsCompleted) totalQuestsCompleted=s.totalQuestsCompleted;
+
     // Render quests
     document.getElementById('main-quests').innerHTML='';
     document.getElementById('side-quests').innerHTML='';
+    document.getElementById('daily-quests').innerHTML='';
     document.getElementById('completed-quests').innerHTML='';
+
     window.quests.main.forEach(q=>{
       const el=makeQuestEl(q,'main');
       if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
@@ -873,6 +1180,11 @@ function loadGame(){
       if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
       document.getElementById('side-quests').appendChild(el);
     });
+    window.quests.daily.forEach(q=>{
+      const el=makeQuestEl(q,'daily');
+      if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
+      document.getElementById('daily-quests').appendChild(el);
+    });
     // Render completed quests
     window.quests.completed.forEach(q=>{
       document.getElementById('completed-quests').appendChild(makeCompletedQuestEl(q));
@@ -880,14 +1192,17 @@ function loadGame(){
     if(window.quests.completed.length>0){
       document.getElementById('completed-empty').style.display='none';
     }
-    // Render inventory
+    // Render inventory with rarities
     if(s.inventory&&s.inventory.length){
       const inv=document.getElementById('inv');
       inv.innerHTML='';
-      s.inventory.forEach(name=>{
+      s.inventory.forEach(item=>{
         const pill=document.createElement('div');
-        pill.className='inv-pill';
+        const rarity=typeof item==='object'?item.rarity:'common';
+        const name=typeof item==='object'?item.name:item;
+        pill.className='inv-pill rarity-'+rarity;
         pill.textContent=name;
+        pill.dataset.rarity=rarity;
         inv.appendChild(pill);
       });
     }
@@ -905,8 +1220,10 @@ function loadGame(){
       document.getElementById('rollbtn').disabled=false;
       document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
     }
+    // Check daily resets
+    checkDailyResets();
     return true;
-  }catch(e){return false;}
+  }catch(e){console.error(e);return false;}
 }
 
 function resetGame(){
@@ -915,22 +1232,186 @@ function resetGame(){
   location.reload();
 }
 
-const lootTable=[
-  {type:"weapon",slot:"weapon",name:"Blade of Confident Words",desc:"+1 CHA — your words cut true.",stat:"CHA",val:1},
-  {type:"weapon",slot:"weapon",name:"Staff of Arcane Authority",desc:"+1 INT — knowledge made manifest.",stat:"INT",val:1},
-  {type:"armor",slot:"chest",name:"Mantle of Persistence",desc:"+1 STR — rejection slides off.",stat:"STR",val:1},
-  {type:"armor",slot:"helm",name:"Helm of Focus",desc:"+1 INT — your mind sharpens under pressure.",stat:"INT",val:1},
-  {type:"accessory",slot:"ring",name:"Ring of Resilience",desc:"+2 STR — your resolve is unbreakable.",stat:"STR",val:2},
-  {type:"accessory",slot:"amulet",name:"Amulet of Silver Tongue",desc:"+2 CHA — words flow like honey.",stat:"CHA",val:2},
-  {type:"accessory",slot:"offhand",name:"Tome of Hidden Lore",desc:"+2 INT — ancient secrets unlocked.",stat:"INT",val:2},
-  {type:"legendary",slot:"ring",name:"The Adventurer's Signet",desc:"All stats +1. Forged for those who face the grind without flinching.",stat:"ALL",val:1},
-];
+// Expanded Loot Table with Rarities
+const lootTable={
+  common:[
+    {slot:"weapon",name:"Rusty Blade",desc:"+1 STR — better than nothing.",stat:"STR",val:1},
+    {slot:"helm",name:"Worn Cap",desc:"+1 INT — keeps thoughts in.",stat:"INT",val:1},
+    {slot:"chest",name:"Tattered Cloak",desc:"+1 CHA — mysterious, at least.",stat:"CHA",val:1},
+    {slot:"offhand",name:"Wooden Shield",desc:"+1 STR — splinters included.",stat:"STR",val:1},
+  ],
+  uncommon:[
+    {slot:"weapon",name:"Blade of Confident Words",desc:"+2 CHA — your words cut true.",stat:"CHA",val:2},
+    {slot:"weapon",name:"Staff of Arcane Authority",desc:"+2 INT — knowledge made manifest.",stat:"INT",val:2},
+    {slot:"chest",name:"Mantle of Persistence",desc:"+2 STR — rejection slides off.",stat:"STR",val:2},
+    {slot:"helm",name:"Helm of Focus",desc:"+2 INT — your mind sharpens.",stat:"INT",val:2},
+  ],
+  rare:[
+    {slot:"ring",name:"Ring of Resilience",desc:"+3 STR — your resolve is unbreakable.",stat:"STR",val:3},
+    {slot:"amulet",name:"Amulet of Silver Tongue",desc:"+3 CHA — words flow like honey.",stat:"CHA",val:3},
+    {slot:"offhand",name:"Tome of Hidden Lore",desc:"+3 INT — ancient secrets unlocked.",stat:"INT",val:3},
+    {slot:"chest",name:"Dragonscale Vest",desc:"+3 STR — forged in dragonfire.",stat:"STR",val:3},
+  ],
+  legendary:[
+    {slot:"ring",name:"The Adventurer's Signet",desc:"+2 ALL stats. Forged for those who never quit.",stat:"ALL",val:2},
+    {slot:"weapon",name:"Excalibur of Ambition",desc:"+2 ALL stats. The blade of destiny.",stat:"ALL",val:2},
+    {slot:"amulet",name:"Crown Jewel of Mastery",desc:"+2 ALL stats. True power recognized.",stat:"ALL",val:2},
+  ]
+};
 
-function rewardText(xp,stat,sv){
+function rewardText(xp,stat,sv,freq){
   let t='+'+xp+' XP';
   if(stat>=0) t+=' · +'+sv+' '+statNames[stat];
   t+=' · loot roll';
+  if(freq) t+=' · '+freq;
   return t;
+}
+
+// Class Selection
+function selectClass(cls){
+  playerClass=cls;
+  const bonus=classBonus[cls];
+  stats[bonus.stat]+=bonus.base;
+  document.getElementById('class-modal').classList.add('hidden');
+  const classEl=document.getElementById('char-class');
+  classEl.textContent='Class: '+cls.charAt(0).toUpperCase()+cls.slice(1);
+  classEl.className='char-class '+cls;
+  showToast('You are now a '+cls.charAt(0).toUpperCase()+cls.slice(1)+'!');
+  render();
+  saveGame();
+  checkBossSpawn();
+}
+
+function showClassModal(){
+  document.getElementById('class-modal').classList.remove('hidden');
+}
+
+// Boss System
+function checkBossSpawn(){
+  if(!boss.active && totalQuestsCompleted>=5){
+    spawnBoss();
+  }
+}
+
+function spawnBoss(){
+  boss.active=true;
+  boss.name=bossNames[boss.level%bossNames.length];
+  boss.maxHp=50+(boss.level*50);
+  boss.hp=boss.maxHp;
+  document.getElementById('boss-panel').classList.remove('hidden');
+  renderBoss();
+  showToast('A boss appears: '+boss.name+'!');
+}
+
+function damageBoss(dmg){
+  if(!boss.active) return;
+  boss.hp=Math.max(0,boss.hp-dmg);
+  renderBoss();
+  if(boss.hp<=0) defeatBoss();
+}
+
+function defeatBoss(){
+  const bossXP=100+(boss.level*50);
+  xp+=bossXP;
+  const maxXP=level*100;
+  if(xp>=maxXP){xp-=maxXP;level++;showToast('Level up! You are now level '+level+'.');}
+
+  // Guaranteed rare+ loot
+  const roll=Math.random();
+  const rarity=roll<0.3?'legendary':'rare';
+  const items=lootTable[rarity];
+  const item=items[Math.floor(Math.random()*items.length)];
+  awardLoot(item,rarity);
+
+  showToast('Boss defeated! +'+bossXP+' XP + '+rarity+' loot!');
+  boss.level++;
+  boss.active=false;
+  document.getElementById('boss-panel').classList.add('hidden');
+  render();
+  saveGame();
+
+  // Spawn next boss after delay
+  setTimeout(()=>{if(totalQuestsCompleted>=5)spawnBoss();},2000);
+}
+
+function renderBoss(){
+  document.getElementById('boss-name').textContent=boss.name;
+  document.getElementById('boss-hp').textContent=boss.hp;
+  document.getElementById('boss-hp-max').textContent=boss.maxHp;
+  document.getElementById('boss-hp-fill').style.width=(boss.hp/boss.maxHp*100)+'%';
+}
+
+// Daily Quest Reset Check
+function checkDailyResets(){
+  const now=new Date();
+  const today=now.toDateString();
+  const monday=getMonday(now).toDateString();
+
+  window.quests.daily.forEach(q=>{
+    if(q.done){
+      const completedDate=new Date(q.completedAt);
+      if(q.freq==='daily' && completedDate.toDateString()!==today){
+        resetDailyQuest(q);
+      }else if(q.freq==='weekly' && getMonday(completedDate).toDateString()!==monday){
+        resetDailyQuest(q);
+      }
+    }
+  });
+}
+
+function getMonday(d){
+  const date=new Date(d);
+  const day=date.getDay();
+  const diff=date.getDate()-day+(day===0?-6:1);
+  return new Date(date.setDate(diff));
+}
+
+function resetDailyQuest(q){
+  q.done=false;
+  delete q.completedAt;
+  const el=document.getElementById('qi'+q.id);
+  if(el){
+    el.classList.remove('done');
+    el.querySelector('.qcheck').classList.remove('done');
+  }
+  saveGame();
+}
+
+function getResetTimer(freq){
+  const now=new Date();
+  let target;
+  if(freq==='daily'){
+    target=new Date(now);
+    target.setDate(target.getDate()+1);
+    target.setHours(0,0,0,0);
+  }else{
+    target=getMonday(now);
+    target.setDate(target.getDate()+7);
+    target.setHours(0,0,0,0);
+  }
+  const diff=target-now;
+  const hours=Math.floor(diff/3600000);
+  const mins=Math.floor((diff%3600000)/60000);
+  return hours+'h '+mins+'m';
+}
+
+// Award loot helper
+function awardLoot(item,rarity){
+  if(item.stat==='ALL'){stats[0]+=item.val;stats[1]+=item.val;stats[2]+=item.val;}
+  else stats[statIdx[item.stat]]+=item.val;
+
+  if(slots[item.slot]===null){
+    slots[item.slot]=item.name;
+    slotRarities[item.slot]=rarity;
+  } else {
+    const inv=document.getElementById('inv');
+    if(inv.querySelector('span')) inv.innerHTML='';
+    const pill=document.createElement('div');
+    pill.className='inv-pill rarity-'+rarity;
+    pill.textContent=item.name;
+    pill.dataset.rarity=rarity;
+    inv.appendChild(pill);
+  }
 }
 
 function showToast(msg){
@@ -951,15 +1432,18 @@ function makeQuestEl(q,type){
   const div=document.createElement('div');
   div.className='quest-item';
   div.id='qi'+q.id;
+  const freqBadge=q.freq?`<span class="quest-frequency freq-${q.freq}">${q.freq}</span>`:'';
+  const resetTimer=q.freq&&q.done?`<div class="reset-timer">Resets in: ${getResetTimer(q.freq)}</div>`:'';
   div.innerHTML=`
     <div class="qcheck" id="qc${q.id}" onclick="completeQuest(${q.id})">
       <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div style="flex:1;">
-      <div class="tag tag-${type}">${type}</div>
+      <div class="tag tag-${type}">${type}${freqBadge}</div>
       <div class="qt" id="qt${q.id}">${q.title}</div>
       <div class="qd" id="qd${q.id}">${q.desc||''}</div>
-      <div class="qr">${rewardText(q.xp,q.stat,q.sv)}</div>
+      <div class="qr">${rewardText(q.xp,q.stat,q.sv,q.freq)}</div>
+      ${resetTimer}
     </div>
     <button class="del-btn" onclick="deleteQuest(${q.id},'${type}')" title="Remove quest">&#x2715;</button>
   `;
@@ -972,13 +1456,22 @@ function addQuest(type){
   if(!rawText) return;
   inp.value='';
 
-  const stat=type==='side'
-    ? parseInt(document.getElementById('side-stat').value)
-    : (rawText.match(/apply|job|applic/i)?0:rawText.match(/study|learn|read|research/i)?2:1);
-  const xpAmt=type==='main'?30:15;
+  let stat,freq=null;
+  if(type==='daily'){
+    stat=parseInt(document.getElementById('daily-stat').value);
+    freq=document.getElementById('daily-freq').value;
+  }else if(type==='side'){
+    stat=parseInt(document.getElementById('side-stat').value);
+  }else{
+    stat=rawText.match(/apply|job|applic/i)?0:rawText.match(/study|learn|read|research/i)?2:1;
+  }
+
+  const xpAmt=type==='main'?30:(type==='daily'?20:15);
   const sv=stat>=0?1:0;
 
   const q={id:qid++,title:rawText,desc:'Inscribing quest lore...',xp:xpAmt,stat,sv,done:false,type};
+  if(freq) q.freq=freq;
+
   window.quests[type].push(q);
   const el=makeQuestEl(q,type);
   document.getElementById(type+'-quests').appendChild(el);
@@ -1053,7 +1546,7 @@ function deleteQuest(id,type){
 }
 
 function completeQuest(id){
-  for(const type of['main','side']){
+  for(const type of['main','side','daily']){
     const idx=window.quests[type].findIndex(q=>q.id===id);
     if(idx!==-1){
       const q=window.quests[type][idx];
@@ -1063,27 +1556,53 @@ function completeQuest(id){
       q.done=true;
       q.completedAt=new Date().toISOString();
 
-      // Award rewards
+      // Award rewards with class bonus
       xp+=q.xp;
-      if(q.stat>=0) stats[q.stat]+=q.sv;
+      if(q.stat>=0){
+        let statGain=q.sv;
+        // Apply class bonus if matching stat
+        if(playerClass && classBonus[playerClass].stat===q.stat){
+          statGain=Math.ceil(statGain*classBonus[playerClass].multiplier);
+        }
+        stats[q.stat]+=statGain;
+      }
       const maxXP=level*100;
       if(xp>=maxXP){xp-=maxXP;level++;showToast('Level up! You are now level '+level+'.');}
       rolls++;
       document.getElementById('rollbtn').disabled=false;
       document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
 
-      // Move to completed
-      window.quests[type].splice(idx,1);
-      window.quests.completed.push(q);
+      // Track total quests and damage boss
+      totalQuestsCompleted++;
+      const bossDmg=10+Math.floor(q.xp/3);
+      damageBoss(bossDmg);
 
-      // Update UI
-      document.getElementById('qi'+id).remove();
-      document.getElementById('completed-quests').appendChild(makeCompletedQuestEl(q));
-      document.getElementById('completed-empty').style.display='none';
+      // Handle daily quests (stay in place) vs regular quests (move to completed)
+      if(type==='daily'){
+        // Daily quests stay, just mark done
+        document.getElementById('qi'+id).classList.add('done');
+        document.getElementById('qc'+id).classList.add('done');
+        // Update the element to show reset timer
+        const el=document.getElementById('qi'+id);
+        if(el){
+          el.innerHTML=makeQuestEl(q,type).innerHTML;
+          el.querySelector('.qcheck').classList.add('done');
+        }
+      }else{
+        // Move to completed
+        window.quests[type].splice(idx,1);
+        window.quests.completed.push(q);
+
+        // Update UI
+        document.getElementById('qi'+id).remove();
+        document.getElementById('completed-quests').appendChild(makeCompletedQuestEl(q));
+        document.getElementById('completed-empty').style.display='none';
+      }
 
       showToast('Quest complete! Loot roll earned.');
       render();
       saveGame();
+      checkBossSpawn();
       return;
     }
   }
@@ -1163,29 +1682,24 @@ function rollLoot(){
   if(rolls<=0)return;
   rolls--;
   const roll=Math.floor(Math.random()*20)+1;
-  let item;
-  if(roll===20) item=lootTable[7];
-  else if(roll>=16) item=lootTable[4+Math.floor(Math.random()*3)];
-  else item=lootTable[Math.floor(Math.random()*4)];
 
-  if(item.stat==='ALL'){stats[0]++;stats[1]++;stats[2]++;}
-  else stats[statIdx[item.stat]]+=item.val;
+  // Determine rarity based on roll
+  let rarity;
+  if(roll===20) rarity='legendary';
+  else if(roll>=16) rarity='rare';
+  else if(roll>=11) rarity='uncommon';
+  else rarity='common';
 
-  if(slots[item.slot]===null){
-    slots[item.slot]=item.name;
-  } else {
-    const inv=document.getElementById('inv');
-    if(inv.querySelector('span')) inv.innerHTML='';
-    const pill=document.createElement('div');
-    pill.className='inv-pill';
-    pill.textContent=item.name;
-    inv.appendChild(pill);
-  }
+  const items=lootTable[rarity];
+  const item=items[Math.floor(Math.random()*items.length)];
 
-  const isLegendary=roll===20;
+  // Award the loot
+  awardLoot(item,rarity);
+
+  const rarityLabel=rarity.charAt(0).toUpperCase()+rarity.slice(1);
   document.getElementById('loot-out').innerHTML=`
-    <div class="loot-reveal${isLegendary?' loot-legendary':''}">
-      <div class="loot-type">${item.type} · <span class="roll-num">${roll}</span></div>
+    <div class="loot-reveal rarity-${rarity}">
+      <div class="loot-type">${rarityLabel} · <span class="roll-num">${roll}</span></div>
       <div class="loot-name">${item.name}</div>
       <div class="loot-desc">${item.desc}</div>
     </div>`;
@@ -1196,7 +1710,8 @@ function rollLoot(){
     document.getElementById('rollbtn').disabled=true;
     document.getElementById('roll-prompt').textContent='Complete more quests to earn rolls.';
   }
-  if(isLegendary) showToast('LEGENDARY drop! All stats +1!');
+  if(rarity==='legendary') showToast('LEGENDARY drop! All stats +'+item.val+'!');
+  else if(rarity==='rare') showToast('RARE drop! +'+item.val+' '+item.stat+'!');
   render();
   saveGame();
 }
@@ -1209,9 +1724,11 @@ function render(){
   document.getElementById('hdr-lvl').textContent=level;
   document.getElementById('xpbar').style.width=Math.round(xp/maxXP*100)+'%';
   Object.entries(slots).forEach(([slot,item])=>{
+    const rarity=slotRarities[slot];
     const el=document.getElementById('eq-'+slot);
     if(!el||!item)return;
     el.classList.add('filled');
+    if(rarity) el.classList.add('rarity-'+rarity);
     el.innerHTML='<div class="eq-slot-name">'+slot.charAt(0).toUpperCase()+slot.slice(1)+'</div><div class="eq-slot-item">'+item+'</div>';
   });
 }
@@ -1234,6 +1751,11 @@ const defaultSide=[
 if(!loadGame()){
   defaultMain.forEach(d=>{const q={...d,id:qid++,done:false,type:'main'};window.quests.main.push(q);document.getElementById('main-quests').appendChild(makeQuestEl(q,'main'));});
   defaultSide.forEach(d=>{const q={...d,id:qid++,done:false,type:'side'};window.quests.side.push(q);document.getElementById('side-quests').appendChild(makeQuestEl(q,'side'));});
+  // Show class selection for new games
+  showClassModal();
+}else{
+  // Check for boss spawn on load
+  if(!boss.active) checkBossSpawn();
 }
 
 document.getElementById('portrait-input').addEventListener('change',function(e){
@@ -1253,9 +1775,13 @@ document.getElementById('portrait-input').addEventListener('change',function(e){
 
 document.getElementById('main-input').addEventListener('keydown',e=>{if(e.key==='Enter')addQuest('main');});
 document.getElementById('side-input').addEventListener('keydown',e=>{if(e.key==='Enter')addQuest('side');});
+document.getElementById('daily-input').addEventListener('keydown',e=>{if(e.key==='Enter')addQuest('daily');});
 
 render();
 updateApiStatus();
+
+// Check daily resets periodically
+setInterval(checkDailyResets,60000);
 </script>
 </body>
 </html>
