@@ -548,6 +548,46 @@
 
   #portrait-input { display: none; }
 
+  .api-settings {
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+  }
+
+  .api-settings input {
+    width: 100%;
+    font-size: 12px;
+    padding: 7px 9px;
+  }
+
+  .api-hint {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .api-hint.active {
+    color: var(--success);
+  }
+
+  .reset-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 0.5px solid var(--danger);
+    background: rgba(192,57,43,0.1);
+    color: var(--danger);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .reset-btn:hover {
+    background: rgba(192,57,43,0.2);
+  }
+
   @media (max-width: 640px) {
     .layout { grid-template-columns: 1fr; }
     .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
@@ -616,6 +656,17 @@
       <button class="roll-btn" id="rollbtn" disabled onclick="rollLoot()">&#x2684; Roll for loot</button>
       <div id="loot-out"></div>
     </div>
+
+    <div class="divider"></div>
+    <div class="section-title">API Settings</div>
+    <div class="api-settings">
+      <input type="password" id="api-key-input" placeholder="Your Anthropic API key (optional)">
+      <button class="add-btn" onclick="saveApiKey()" style="margin-top:6px;width:100%;">Save Key</button>
+      <div class="api-hint" id="api-status">No key saved — quests will use plain text</div>
+    </div>
+
+    <div class="divider"></div>
+    <button class="reset-btn" onclick="resetGame()">Reset Progress</button>
   </aside>
 
   <main class="main">
@@ -665,6 +716,107 @@ const slots={weapon:null,offhand:null,helm:null,chest:null,ring:null,amulet:null
 const statIdx={STR:0,CHA:1,INT:2};
 const statNames=['STR','CHA','INT'];
 window.quests={main:[],side:[]};
+
+// API Key Management (stored locally in user's browser only)
+function saveApiKey(){
+  const key=document.getElementById('api-key-input').value.trim();
+  if(key){
+    localStorage.setItem('qb_api_key',key);
+    document.getElementById('api-key-input').value='';
+    updateApiStatus();
+    showToast('API key saved locally');
+  }else{
+    localStorage.removeItem('qb_api_key');
+    updateApiStatus();
+    showToast('API key removed');
+  }
+}
+
+function getApiKey(){
+  return localStorage.getItem('qb_api_key')||'';
+}
+
+function updateApiStatus(){
+  const status=document.getElementById('api-status');
+  if(getApiKey()){
+    status.textContent='Key saved — AI quest generation enabled';
+    status.classList.add('active');
+  }else{
+    status.textContent='No key saved — quests will use plain text';
+    status.classList.remove('active');
+  }
+}
+
+// Save/Load Game State
+function saveGame(){
+  const state={
+    stats:[...stats],
+    xp,level,rolls,qid,
+    slots:{...slots},
+    quests:{main:[...window.quests.main],side:[...window.quests.side]},
+    inventory:Array.from(document.querySelectorAll('.inv-pill')).map(p=>p.textContent),
+    portrait:document.getElementById('portrait-img').src||null
+  };
+  localStorage.setItem('qb_save',JSON.stringify(state));
+}
+
+function loadGame(){
+  const raw=localStorage.getItem('qb_save');
+  if(!raw) return false;
+  try{
+    const s=JSON.parse(raw);
+    stats[0]=s.stats[0];stats[1]=s.stats[1];stats[2]=s.stats[2];
+    xp=s.xp;level=s.level;rolls=s.rolls;qid=s.qid;
+    Object.assign(slots,s.slots);
+    window.quests.main=s.quests.main;
+    window.quests.side=s.quests.side;
+    // Render quests
+    document.getElementById('main-quests').innerHTML='';
+    document.getElementById('side-quests').innerHTML='';
+    window.quests.main.forEach(q=>{
+      const el=makeQuestEl(q,'main');
+      if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
+      document.getElementById('main-quests').appendChild(el);
+    });
+    window.quests.side.forEach(q=>{
+      const el=makeQuestEl(q,'side');
+      if(q.done){el.classList.add('done');el.querySelector('.qcheck').classList.add('done');}
+      document.getElementById('side-quests').appendChild(el);
+    });
+    // Render inventory
+    if(s.inventory&&s.inventory.length){
+      const inv=document.getElementById('inv');
+      inv.innerHTML='';
+      s.inventory.forEach(name=>{
+        const pill=document.createElement('div');
+        pill.className='inv-pill';
+        pill.textContent=name;
+        inv.appendChild(pill);
+      });
+    }
+    // Render portrait
+    if(s.portrait){
+      const img=document.getElementById('portrait-img');
+      img.src=s.portrait;
+      img.style.display='block';
+      document.getElementById('portrait-icon').style.display='none';
+      document.getElementById('portrait-hint').style.display='none';
+      document.getElementById('portrait-box').style.border='none';
+    }
+    // Update roll button
+    if(rolls>0){
+      document.getElementById('rollbtn').disabled=false;
+      document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
+    }
+    return true;
+  }catch(e){return false;}
+}
+
+function resetGame(){
+  if(!confirm('Reset all progress? This cannot be undone.')) return;
+  localStorage.removeItem('qb_save');
+  location.reload();
+}
 
 const lootTable=[
   {type:"weapon",slot:"weapon",name:"Blade of Confident Words",desc:"+1 CHA — your words cut true.",stat:"CHA",val:1},
@@ -733,6 +885,7 @@ function addQuest(type){
   window.quests[type].push(q);
   const el=makeQuestEl(q,type);
   document.getElementById(type+'-quests').appendChild(el);
+  saveGame();
 
   generateFlavour(rawText, type, q.id);
 }
@@ -740,6 +893,15 @@ function addQuest(type){
 async function generateFlavour(rawText, type, id){
   const titleEl=document.getElementById('qt'+id);
   const descEl=document.getElementById('qd'+id);
+
+  // Check for user's own API key - if none, skip AI and use plain text
+  const apiKey=getApiKey();
+  if(!apiKey){
+    if(titleEl) titleEl.textContent=rawText;
+    if(descEl) descEl.textContent='';
+    return;
+  }
+
   if(titleEl) titleEl.innerHTML='<span class="spinner"></span>Inscribing...';
 
   const context=type==='main'
@@ -759,7 +921,9 @@ Reply with ONLY a raw JSON object, no markdown, no backticks:
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'anthropic-dangerous-direct-browser-access':'true'
+        'x-api-key':apiKey,
+        'anthropic-dangerous-direct-browser-access':'true',
+        'anthropic-version':'2023-06-01'
       },
       body:JSON.stringify({
         model:'claude-haiku-4-5-20251001',
@@ -777,7 +941,7 @@ Reply with ONLY a raw JSON object, no markdown, no backticks:
     if(titleEl) titleEl.textContent=f.title;
     if(descEl) descEl.textContent=f.desc;
     const q=[...window.quests.main,...window.quests.side].find(q=>q.id===id);
-    if(q){q.title=f.title;q.desc=f.desc;}
+    if(q){q.title=f.title;q.desc=f.desc;saveGame();}
   } catch(err) {
     if(titleEl) titleEl.textContent=rawText;
     if(descEl) descEl.textContent='';
@@ -788,6 +952,7 @@ function deleteQuest(id,type){
   const el=document.getElementById('qi'+id);
   if(el) el.remove();
   window.quests[type]=window.quests[type].filter(q=>q.id!==id);
+  saveGame();
 }
 
 function completeQuest(id){
@@ -806,6 +971,7 @@ function completeQuest(id){
       document.getElementById('roll-prompt').textContent=rolls+' loot roll'+(rolls>1?'s':'')+' available!';
       showToast('Quest complete! Loot roll earned.');
       render();
+      saveGame();
       return;
     }
   }
@@ -850,6 +1016,7 @@ function rollLoot(){
   }
   if(isLegendary) showToast('LEGENDARY drop! All stats +1!');
   render();
+  saveGame();
 }
 
 function render(){
@@ -881,8 +1048,11 @@ const defaultSide=[
   {title:"Seal the Ground",desc:"Spray prime the bases — bind them against the ravages of war.",xp:15,stat:-1,sv:0},
 ];
 
-defaultMain.forEach(d=>{const q={...d,id:qid++,done:false,type:'main'};window.quests.main.push(q);document.getElementById('main-quests').appendChild(makeQuestEl(q,'main'));});
-defaultSide.forEach(d=>{const q={...d,id:qid++,done:false,type:'side'};window.quests.side.push(q);document.getElementById('side-quests').appendChild(makeQuestEl(q,'side'));});
+// Load saved game or initialize with defaults
+if(!loadGame()){
+  defaultMain.forEach(d=>{const q={...d,id:qid++,done:false,type:'main'};window.quests.main.push(q);document.getElementById('main-quests').appendChild(makeQuestEl(q,'main'));});
+  defaultSide.forEach(d=>{const q={...d,id:qid++,done:false,type:'side'};window.quests.side.push(q);document.getElementById('side-quests').appendChild(makeQuestEl(q,'side'));});
+}
 
 document.getElementById('portrait-input').addEventListener('change',function(e){
   const file=e.target.files[0];if(!file)return;
@@ -894,6 +1064,7 @@ document.getElementById('portrait-input').addEventListener('change',function(e){
     document.getElementById('portrait-icon').style.display='none';
     document.getElementById('portrait-hint').style.display='none';
     document.getElementById('portrait-box').style.border='none';
+    saveGame();
   };
   reader.readAsDataURL(file);
 });
@@ -902,6 +1073,7 @@ document.getElementById('main-input').addEventListener('keydown',e=>{if(e.key===
 document.getElementById('side-input').addEventListener('keydown',e=>{if(e.key==='Enter')addQuest('side');});
 
 render();
+updateApiStatus();
 </script>
 </body>
 </html>

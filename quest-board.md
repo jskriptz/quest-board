@@ -106,15 +106,28 @@ Each quest has the following fields:
 
 ---
 
-## AI Quest Generation
+## AI Quest Generation (Optional — Bring Your Own Key)
 
-When a new quest is added, the app calls the Anthropic API (`claude-haiku-4-5-20251001`) to generate:
-- A short epic RPG quest title (4–6 words)
-- A one-sentence dark fantasy flavour description
+AI quest generation is **optional** and uses a **Bring Your Own Key (BYOK)** model.
 
-The call requires the header `anthropic-dangerous-direct-browser-access: true`. This works on GitHub Pages. Local file access may be blocked by CORS depending on browser security settings.
+**To enable AI features:**
+1. Get an API key from https://console.anthropic.com
+2. Enter your key in the "API Settings" section in the sidebar
+3. Your key is stored in your browser only — never on any server
 
-If the API call fails, the plain text entered by the user is used as the title with no description.
+**How it works:**
+- The app calls the Anthropic API (`claude-haiku-4-5-20251001`) to generate:
+  - A short epic RPG quest title (4–6 words)
+  - A one-sentence dark fantasy flavour description
+- Each user pays for their own API usage (Haiku is very cheap)
+- The call requires the header `anthropic-dangerous-direct-browser-access: true`
+
+**Without an API key:**
+- The app works fully offline
+- Quests use the plain text you enter as the title
+- All other features (stats, loot, levelling) work normally
+
+If the API call fails, the plain text is used as a fallback.
 
 ---
 
